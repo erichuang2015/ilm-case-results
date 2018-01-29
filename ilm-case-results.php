@@ -176,7 +176,7 @@ function print_results_page_list() {
 
 function ilm_ajax_scripts() {
 	if ( is_page_template('case-results.php') ) {
-	wp_enqueue_script('ilm-ajax', plugins_url( '/js/ilm-ajax.js', __FILE__ ), array('jquery'), null, true);
+	wp_enqueue_script('ilm-ajax', plugins_url( '/js/ilm-ajax-min.js', __FILE__ ), array('jquery'), null, true);
 	}
 }
 

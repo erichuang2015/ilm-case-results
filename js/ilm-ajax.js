@@ -1,12 +1,34 @@
-
-(function($) {
+;(function($) {
 
     const container = $('.results')
     const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/case_results'
     const mainCats = $('.main-cat')
     const subCats = $('.sub-cat')
-
     let currentCat = ''
+
+    function updateResults( cat ) {
+        $.ajax({
+            url: path + '?parent=' +cat,
+
+            success: function( data ) {
+
+                let html = ''
+                    html += '<p class="intro">// Top Featured Results</p>'
+
+                for ( let result of data ) {
+                    html += '<article class="case-result">'
+                    html += '<h2 class="post-title">' + result.title.rendered + '</h2>'
+                    html += result.content.rendered
+                    html += '</article>'
+                }
+
+                $(container).html(html)
+                $('html, body').animate({
+                    scrollTop: container.offset().top - 70
+                }, 1000)
+            }
+        })
+    }
 
     $(mainCats).on('click', 'li', function() {
         let self = $(this)
@@ -41,30 +63,6 @@
 
     $(document.location).on('change', updateResults())
 
-    function updateResults( cat ) {
-        $.ajax({
-            url: path + '?parent=' +cat,
-
-            success: function( data ) {
-
-                let html = ''
-                    html += '<p class="intro">// Top Featured Results</p>'
-
-                for ( let result of data ) {
-                    html += '<article class="case-result">'
-                    html += '<h2 class="post-title">' + result.title.rendered + '</h2>'
-                    html += result.content.rendered
-                    html += '</article>'
-                }
-
-                $(container).html(html)
-                $('html, body').animate({
-                    scrollTop: container.offset().top - 70
-                }, 1000,)
-            }
-        })
-    }
-
     if ( document.location.hash ) {
         let cat = document.location.hash.replace('#', '')
         $('li[data-id="'+cat+'"]').addClass('active')
@@ -72,4 +70,4 @@
         updateResults( cat )
     }
 
-})(jQuery);
+})(jQuery)
