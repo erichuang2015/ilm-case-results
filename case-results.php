@@ -47,23 +47,30 @@
                     </div>
                 </div>
                 <div class="bottom-wrap">
-                    <div class="results">
+                    <div class="container">
                         <p class="intro">// Top Featured Results</p>
-                        <?php
-                        $initial_results = new WP_Query(array(
-                            'post_type' => 'case_results',
-                            'post_parent' => 0,
-                            'posts_per_page' => -1,
-                            'orderby' => 'title',
-                            'order' => 'ASC'
-                        ));
-                        if ( $initial_results->have_posts() ) : while ( $initial_results->have_posts() ) : $initial_results->the_post();
-                        ?>
-                        <article class="case-result">
-                            <h2 class="post-title"><?php the_title(); ?></h2>
-                            <?php the_content(); ?>
-                        </article>
-                    <?php endwhile; endif; ?>
+                        <div class="results">
+                            <?php
+                            $initial_results = new WP_Query(array(
+                                'post_type' => 'case_results',
+                                'post_parent' => 38,
+                                'posts_per_page' => 5,
+                                'orderby' => 'title',
+                                'order' => 'ASC'
+                            ));
+                            if ( $initial_results->have_posts() ) : while ( $initial_results->have_posts() ) : $initial_results->the_post();
+                            ?>
+                            <article class="case-result">
+                                <h2 class="post-title"><?php the_title(); ?></h2>
+                                <?php the_content(); ?>
+                            </article>
+                        <?php endwhile; endif; ?>
+                        </div>
+
+                        <div class="pagination">
+                            <a class="results-prev">Prev</a>
+                            <a class="results-next">Next</a>
+                        </div>
                     </div>
                 </div>
 			<?php endwhile; else : ?>
