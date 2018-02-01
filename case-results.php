@@ -44,6 +44,9 @@
                                 <?php echo $childPages; ?>
                             </ul>
                         </div>
+                        <div class="select-wrap">
+                            <button id="cr-search" class="button">Search</button>
+                        </div>
                     </div>
                 </div>
                 <div class="bottom-wrap">

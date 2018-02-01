@@ -16,17 +16,29 @@
     */
 
     const container = $('.results')
+    const mainCats  = $('.main-cat')
+    const subCats   = $('.sub-cat')
+    const searchBtn = $('#cr-search')
+    const prev      = $('.results-prev')
+    const next      = $('.results-next')
+
+    let hash        = document.location.hash.replace('#', '')
+    let currentCat  = 0
+    let offset      = 0
+    let totalPosts  = 0
+
     const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/case_results?per_page=5'
-    const mainCats = $('.main-cat')
-    const subCats = $('.sub-cat')
-    const prev = $('.results-prev')
-    const next = $('.results-next')
 
-    let hash = document.location.hash.replace('#', '')
-    let currentCat = 0
-    let offset = 0
+    /*
+    ** Get the total amount of posts so we know what we're
+    ** Dealing with when it comes to offsets, etc.
+    */
+    $.get( path, function( data, status, request ) {
+        totalPosts = request.getResponseHeader('x-wp-total');
+    })
 
-    function updateResults( category, offset ) {
+    // Default offset is zero and is not a required param
+    function updateResults( category, offset = 0 ) {
 
         $.ajax({
 
@@ -37,7 +49,7 @@
             },
 
             error: function() {
-                console.log('DANGER, WILL ROBINSON!')
+                // console.log('DANGER, WILL ROBINSON!')
             },
 
             success: function( data ) {
@@ -76,7 +88,7 @@
     if ( document.location.hash ) {
         $('li[data-id="'+hash+'"]').addClass('active')
         $('.disabled').removeClass('disabled')
-        updateResults( hash, 0 )
+        updateResults( hash )
     }
 
     /*
@@ -89,7 +101,6 @@
         self.addClass('active')
         self.siblings().removeClass('active')
         $(mainCats).toggleClass('open')
-        currentCat = self.data('id')
 
         if ( self.attr('data-name') ) {
             $(mainCats).attr('data-current', currentCat)
@@ -101,18 +112,16 @@
 
     $(subCats).on('click', 'li', function() {
         let self = $(this)
-        let id = self.data('id')
-        currentCat = id
-
         self.addClass('active')
         self.siblings().removeClass('active')
 
         $(subCats).toggleClass('open')
+    })
 
-        updateResults( currentCat, 0 )
-        if ( $(self).attr('data-id') ) {
-            window.location = '#'+id
-        }
+    $(searchBtn).on('click', function() {
+        const chosenCat = $(subCats).children('.active').data('id')
+        currentCat = chosenCat
+        updateResults( chosenCat )
     })
 
     $(next).on('click', function() {
@@ -121,8 +130,7 @@
     })
 
     $(prev).on('click', function() {
-        offset = offset - 5
-        if (offset <= 0) { offset = 0 }
+        offset = offset <= 0 ? 0 : offset - 5;
         updateResults( currentCat, offset )
     })
 
