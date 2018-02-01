@@ -110,6 +110,10 @@
         }
     }
 
+    .disabled {
+        pointer-events: none;
+    }
+
     .container {
         max-width: 110rem;
         margin: 0 auto;
@@ -127,6 +131,7 @@
                 position: relative;
                 padding-bottom: 5rem;
                 margin-bottom: 6rem;
+                font-weight: 700;
 
                 &::after {
                     content: '';
@@ -138,6 +143,15 @@
                     transform: translateX(-50%);
                 }
             }
+        }
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: space-between;
+
+        a {
+            cursor: pointer;
         }
     }
 }

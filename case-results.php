@@ -71,7 +71,7 @@
                         </div>
 
                         <div class="pagination">
-                            <a class="results-prev">Prev</a>
+                            <a class="results-prev disabled">Prev</a>
                             <a class="results-next">Next</a>
                         </div>
                     </div>

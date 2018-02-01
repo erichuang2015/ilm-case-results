@@ -22,8 +22,7 @@
     const prev      = $('.results-prev')
     const next      = $('.results-next')
 
-    let hash        = document.location.hash.replace('#', '')
-    let currentCat  = 0
+    let currentCat  = 38
     let offset      = 0
     let totalPosts  = 0
 
@@ -77,19 +76,40 @@
                 $('html, body').animate({
                     scrollTop: container.offset().top - 300
                 }, 1000)
+
+                let url
+                if ( offset ) {
+                    url = currentCat + '?offset=' + offset
+                } else {
+                    url = currentCat
+                }
+
+                history.pushState({currentCat: currentCat, offset: offset}, null, url)
+
+                if ( offset === 0 ) {
+                    $(prev).addClass('disabled')
+                } else {
+                    $(prev).removeClass('disabled')
+                }
             }
         })
     }
 
     /*
-    ** Checking for a location hash on load is an attempt at creating "permalinks"
-    ** for the CR categories - which are really just parent/child relationships
+    ** Using a combination of popstate listeners and the History API
+    ** we can support loading directly to results as well as updating
+    ** results when forward/backward controls are used.
     */
-    if ( document.location.hash ) {
-        $('li[data-id="'+hash+'"]').addClass('active')
-        $('.disabled').removeClass('disabled')
-        updateResults( hash )
-    }
+    window.addEventListener('popstate', function(e) {
+        console.log( 'Current Cat: ', e.state.currentCat )
+        console.log( 'Current Offset: ', e.state.offset )
+
+        if ( e.state === null ) {
+            updateResults( 38 )
+        } else {
+            updateResults( e.state.CurrentCat, e.stateoffset )
+        }
+    })
 
     /*
     ** Handlers for two "dropdowns" and
@@ -121,6 +141,7 @@
     $(searchBtn).on('click', function() {
         const chosenCat = $(subCats).children('.active').data('id')
         currentCat = chosenCat
+        offset = 0
         updateResults( chosenCat )
     })
 
