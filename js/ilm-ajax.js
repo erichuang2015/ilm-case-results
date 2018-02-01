@@ -44,7 +44,12 @@
             url: path + '&parent=' +category+ '&offset=' +offset,
 
             beforeSend: function() {
-                // console.log('Retrieving ' +category+ ', offset by '+offset)
+                /*
+                ** Scroll the window down to results
+                */
+                $('html, body').animate({
+                    scrollTop: container.offset().top - 300
+                }, 1000)
             },
 
             error: function() {
@@ -69,13 +74,6 @@
             },
 
             complete: function() {
-
-                /*
-                ** Once content is loaded, scroll the window down
-                */
-                $('html, body').animate({
-                    scrollTop: container.offset().top - 300
-                }, 1000)
 
                 let url
                 if ( offset ) {
