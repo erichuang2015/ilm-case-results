@@ -3,7 +3,8 @@
 
 ** This is an immediately invoked function expression (IIFE). It runs on file load
 ** and uses `$` as a jQuery alias. All of this being wrapped in an IIFE makes it
-** conflict-free with any other javascript libraries that might also use `$`
+** conflict-free with any other javascript libraries that might also use `$`.
+** Due to the nature of IIFE, all functions/vars are private.
 */
 
 ;(function($) {
@@ -52,10 +53,6 @@
                 }, 1000)
             },
 
-            error: function() {
-                // console.log('DANGER, WILL ROBINSON!')
-            },
-
             success: function( data ) {
                 /*
                 ** Create an empty var, assign string values to it
@@ -78,18 +75,21 @@
                 let url
                 if ( offset ) {
                     url = currentCat + '?offset=' + offset
+
+                    if ( offset === 0 ) {
+                        $(prev).addClass('disabled')
+                    }
+
                 } else {
                     url = currentCat
+
+                    $(prev).removeClass('disabled')
                 }
 
                 history.pushState({currentCat: currentCat, offset: offset}, null, url)
+            },
 
-                if ( offset === 0 ) {
-                    $(prev).addClass('disabled')
-                } else {
-                    $(prev).removeClass('disabled')
-                }
-            }
+            error: function() { /* console.log('DANGER, WILL ROBINSON!') */ }
         })
     }
 

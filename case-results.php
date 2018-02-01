@@ -71,8 +71,23 @@
                         </div>
 
                         <div class="pagination">
-                            <a class="results-prev disabled">Prev</a>
-                            <a class="results-next">Next</a>
+                            <a class="results-prev disabled">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.6 19.8">
+                                <path fill="#1e2327" d="M.1 9.9H0l9.9 9.9.7-.7-9.2-9.2h.1-.1L3.3 8 10.6.7 9.9 0l-8 8L0 9.9z"/>
+                            </svg>
+                            </a>
+                            <a class="results-next">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.6 19.8">
+                                <path fill="#1e2327" d="M10.5 9.8h.1L.7 0 0 .7l9.2 9.1h-.1l.1.1-1.9 1.9L0 19.1l.7.7 8-8 1.9-1.9z"/>
+                            </svg>
+                            </a>
+                            <div class="pagination-numbers">
+                                <a href="#" data-page="1" class="page-number active">1</a>
+                                <a href="#" data-page="2" class="page-number">2</a>
+                                <a href="#" data-page="3" class="page-number">3</a>
+                                <a href="#" data-page="4" class="page-number">4</a>
+                                <a href="#" data-page="5" class="page-number">5</a>
+                            </div>
                         </div>
                     </div>
                 </div>
