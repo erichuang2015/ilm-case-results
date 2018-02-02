@@ -1,3 +1,5 @@
+// @ts-check
+
 /*
 ** iLawyer Marketing Case Results Listing plugin.
 
@@ -23,7 +25,7 @@
     const prev      = $('.results-prev')
     const next      = $('.results-next')
 
-    let currentCat  = 38
+    let currentCat  = '38' // Magic Number
     let offset      = 0
     let totalPosts  = 0
 
@@ -72,7 +74,7 @@
 
             complete: function() {
 
-                let url
+                let url = ''
                 if ( offset ) {
                     url = currentCat + '?offset=' + offset
 
@@ -103,9 +105,9 @@
         console.log( 'Current Offset: ', e.state.offset )
 
         if ( e.state === null ) {
-            updateResults( 38 )
+            updateResults( '38' )
         } else {
-            updateResults( e.state.CurrentCat, e.stateoffset )
+            updateResults( e.state.CurrentCat, e.state.offset )
         }
     })
 
@@ -153,4 +155,5 @@
         updateResults( currentCat, offset )
     })
 
+// @ts-ignore
 })(jQuery)
