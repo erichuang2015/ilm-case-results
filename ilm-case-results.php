@@ -10,13 +10,13 @@ License: GPL2
 */
 
 // Require ACF Pro
-function require_acf_pro() {
+function ilm_case_results_require_acf_pro() {
     if (
 		is_admin() &&
 		current_user_can( 'activate_plugins' ) &&
 		!is_plugin_active( 'advanced-custom-fields-pro/acf.php' ) ) {
 
-        add_action( 'admin_notices', 'plugin_dependency_notice' );
+        add_action( 'admin_notices', 'ilm_case_results_plugin_dependency_notice' );
 
         deactivate_plugins( plugin_basename( __FILE__ ) );
 
@@ -26,10 +26,10 @@ function require_acf_pro() {
     }
 }
 
-function plugin_dependency_notice() {
+function ilm_case_results_plugin_dependency_notice() {
     echo '<div class="error"><p>Sorry, but this plugin requires Advanced Custom Fields PRO to be installed and active.</p></div>';
 }
-add_action( 'admin_init', 'require_acf_pro' );
+add_action( 'admin_init', 'ilm_case_results_require_acf_pro' );
 
 class CaseResultsTemplate {
 
