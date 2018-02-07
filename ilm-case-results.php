@@ -2,12 +2,34 @@
 /*
 Plugin Name: iLawyer Case Results
 Plugin URI: https://www.ilawyermarketing.com/
-Description: This creates and filters a "Case Results" custom post type
+Description: Creates a "Case Results" custom post type and provides a page template.
 Version: 0.0.1
 Author: Jonathan Dewitt
 Author URI: http://jondewitt.io/
 License: GPL2
 */
+
+// Require ACF Pro
+function require_acf_pro() {
+    if (
+		is_admin() &&
+		current_user_can( 'activate_plugins' ) &&
+		!is_plugin_active( 'advanced-custom-fields-pro/acf.php' ) ) {
+
+        add_action( 'admin_notices', 'plugin_dependency_notice' );
+
+        deactivate_plugins( plugin_basename( __FILE__ ) );
+
+        if ( isset( $_GET['activate'] ) ) {
+            unset( $_GET['activate'] );
+        }
+    }
+}
+
+function plugin_dependency_notice() {
+    echo '<div class="error"><p>Sorry, but this plugin requires Advanced Custom Fields PRO to be installed and active.</p></div>';
+}
+add_action( 'admin_init', 'require_acf_pro' );
 
 class CaseResultsTemplate {
 
