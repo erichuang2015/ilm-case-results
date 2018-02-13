@@ -1,5 +1,3 @@
-// @ts-check
-
 /*
 ** iLawyer Marketing Case Results Listing plugin.
 
@@ -25,7 +23,7 @@
     const prev      = $('.results-prev')
     const next      = $('.results-next')
 
-    let currentCat  = '38' // Magic Number
+    let currentCat  = '38' // Magic Number, ID of default category
     let offset      = 0
     let totalPosts  = 0
 
@@ -40,7 +38,7 @@
     })
 
     // Default offset is zero and is not a required param
-    function updateResults( category, offset = 0 ) {
+    const updateResults = ( category = currentCat, offset = 0 ) => {
 
         $.ajax({
 
@@ -79,13 +77,14 @@
                     url = currentCat + '?offset=' + offset
 
                     if ( offset === 0 ) {
-                        $(prev).addClass('disabled')
+                        $(prev).addClass('disabled').hide()
                     }
 
                 } else {
-                    url = currentCat
 
-                    $(prev).removeClass('disabled')
+                    url = currentCat
+                    $(prev).removeClass('disabled').show()
+
                 }
 
                 history.pushState({currentCat: currentCat, offset: offset}, null, url)
@@ -101,11 +100,8 @@
     ** results when forward/backward controls are used.
     */
     window.addEventListener('popstate', function(e) {
-        console.log( 'Current Cat: ', e.state.currentCat )
-        console.log( 'Current Offset: ', e.state.offset )
-
         if ( e.state === null ) {
-            updateResults( '38' )
+            updateResults()
         } else {
             updateResults( e.state.CurrentCat, e.state.offset )
         }
