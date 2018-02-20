@@ -24,6 +24,7 @@
     const next      = $('.results-next')
 
     let currentCat  = '38' // Magic Number, ID of default category
+    let catSlug     = 'medical-malpractice' // Magic name!
     let offset      = 0
     let totalPosts  = 0
     let resultCount = 5
@@ -75,7 +76,7 @@
 
                 let url = ''
                 if ( offset ) {
-                    url = currentCat + '?offset=' + offset
+                    url = catSlug + '?offset=' + offset
 
                     if ( offset === 0 ) {
                         $(prev).addClass('disabled').hide()
@@ -83,12 +84,12 @@
 
                 } else {
 
-                    url = currentCat
+                    url = catSlug
                     $(prev).removeClass('disabled').show()
 
                 }
 
-                history.pushState({currentCat: currentCat, offset: offset}, null, url)
+                history.pushState({catSlug: catSlug, offset: offset}, null, url)
             },
 
             error: function() { /* console.log('DANGER, WILL ROBINSON!') */ }
@@ -104,7 +105,7 @@
         if ( e.state === null ) {
             updateResults()
         } else {
-            updateResults( e.state.CurrentCat, e.state.offset )
+            updateResults( e.state.catSlug, e.state.offset )
         }
     })
 
@@ -135,7 +136,7 @@
         let self = $(this)
         self.addClass('active')
         self.siblings().removeClass('active')
-
+        catSlug = self.attr('data-name')
         $(subCats).toggleClass('open')
     })
 
