@@ -82,11 +82,6 @@
                             </svg>
                             </a>
                             <div class="pagination-numbers">
-                                <a href="#" data-page="1" class="page-number active">1</a>
-                                <a href="#" data-page="2" class="page-number">2</a>
-                                <a href="#" data-page="3" class="page-number">3</a>
-                                <a href="#" data-page="4" class="page-number">4</a>
-                                <a href="#" data-page="5" class="page-number">5</a>
                             </div>
                         </div>
                     </div>

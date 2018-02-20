@@ -22,6 +22,7 @@
     const searchBtn = $('#cr-search')
     const prev      = $('.results-prev')
     const next      = $('.results-next')
+    const pageLinks = $('.pagination-numbers')
 
     let currentCat  = '38' // Magic Number, ID of default category
     let catSlug     = 'medical-malpractice' // Magic name!
@@ -29,22 +30,47 @@
     let totalPosts  = 0
     let resultCount = 5
 
-    const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/case_results?per_page=' + resultCount
+    const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/case_results'
 
     /*
     ** Get the total amount of posts so we know what we're
     ** Dealing with when it comes to offsets, etc.
     */
-    $.get( path, function( data, status, request ) {
-        totalPosts = request.getResponseHeader('x-wp-total');
-    })
+    function getTotalPosts( cat ) {
+        $.getJSON(path + '?parent=' +cat, postTotalCallback)
+    }
+
+    function postTotalCallback( data ) {
+        totalPosts = data.length
+        createPagination()
+    }
+
+    function createPagination() {
+        let container = $('.pagination-numbers')
+        let amountOfLinks = parseFloat( totalPosts / resultCount )
+        let html = ''
+
+        container.empty()
+
+        if ( amountOfLinks < 1 ) {
+            html += '<a href="#" data-page="1" class="page-number active">1</a>'
+        }
+
+        else {
+            for ( var i = 1; i <= amountOfLinks; i++ ) {
+                html += '<a href="#" data-page="' + i + '" class="page-number">' + i + '</a>'
+            }
+        }
+
+        container.html(html)
+    }
 
     // Default offset is zero and is not a required param
     const updateResults = ( category = currentCat, offset = 0 ) => {
 
         $.ajax({
 
-            url: path + '&parent=' +category+ '&offset=' +offset,
+            url: path + '?per_page=' +resultCount+ '&parent=' +category+ '&offset=' +offset,
 
             beforeSend: function() {
                 /*
@@ -147,6 +173,7 @@
         const chosenCat = $(subCats).children('.active').data('id')
         currentCat = chosenCat
         offset = 0
+        getTotalPosts( chosenCat )
         updateResults( chosenCat )
     })
 
@@ -158,6 +185,15 @@
     prev.on('click', function() {
         offset = offset <= 0 ? 0 : offset - 5;
         updateResults( currentCat, offset )
+    })
+
+    pageLinks.on('click', 'a', function(e) {
+        e.preventDefault()
+        let self = $(this)
+        let pageNum = self.attr('data-page')
+
+        offset = parseInt(resultCount * parseInt(pageNum-1))
+        updateResults( currentCat, offset)
     })
 
 // @ts-ignore
