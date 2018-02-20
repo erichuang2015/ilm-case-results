@@ -86,6 +86,7 @@
             box-shadow: .1rem .2rem .2rem inset rgba(0, 0, 0, .2);
             background: #fff;
             width: 100%;
+            cursor: pointer;
 
             li {
                 padding: 2rem;
@@ -133,8 +134,10 @@
             }
 
             &.disabled {
-                opacity: .2;
+                color: #adadad;
+                opacity: 1;
                 pointer-events: none;
+                cursor: default;
 
                 li:not(:first-child) {
                     display: none;
