@@ -110,7 +110,9 @@
                     z-index: 1;
 
                     &.active {
-                        box-shadow: .1rem -.2rem .2rem inset rgba(0,0,0,.2);
+                        box-shadow: 0;
+                        margin-left: .2rem;
+                        padding-left: 1.8rem;
                     }
 
                     &:first-child {
