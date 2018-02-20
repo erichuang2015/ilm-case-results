@@ -117,11 +117,15 @@
         let self = $(this)
         self.addClass('active')
         self.siblings().removeClass('active')
+        $(subCats).children('.hidden').removeClass('hidden')
         $(mainCats).toggleClass('open')
 
         if ( self.attr('data-name') ) {
+            currentCat = self.attr('data-id')
             $(mainCats).attr('data-current', currentCat)
             $(subCats).removeClass('disabled')
+            $(subCats).children('[data-parent!="' + currentCat + '"]').addClass('hidden')
+            $(subCats).children('li:first-child').removeClass('hidden')
         } else {
             $(subCats).addClass('disabled')
         }
