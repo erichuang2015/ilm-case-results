@@ -28,7 +28,7 @@
     let totalPosts  = 0
     let resultCount = 5
 
-    const path = `#{window.location.protocol}//#{window.location.hostname}/wp-json/wp/v2/case_results?per_page=#{resultCount}`
+    const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/case_results?per_page=' + resultCount
 
     /*
     ** Get the total amount of posts so we know what we're
