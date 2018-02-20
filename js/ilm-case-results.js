@@ -114,45 +114,48 @@
     ** previous/next pagination buttons
     ** Needs some refactoring
     */
-    $(mainCats).on('click', 'li', function() {
+    mainCats.on('click', 'li', function() {
         let self = $(this)
+
         self.addClass('active')
         self.siblings().removeClass('active')
-        $(subCats).children('.hidden').removeClass('hidden')
-        $(mainCats).toggleClass('open')
+        subCats.children('.hidden').removeClass('hidden')
+        mainCats.toggleClass('open')
 
         if ( self.attr('data-name') ) {
             currentCat = self.attr('data-id')
-            $(mainCats).attr('data-current', currentCat)
-            $(subCats).removeClass('disabled')
-            $(subCats).children('[data-parent!="' + currentCat + '"]').addClass('hidden')
-            $(subCats).children('li:first-child').removeClass('hidden')
+
+            mainCats.attr('data-current', currentCat)
+            subCats.removeClass('disabled')
+            subCats.children('[data-parent!="' + currentCat + '"]').addClass('hidden')
+            subCats.children('li:first-child').removeClass('hidden')
         } else {
-            $(subCats).addClass('disabled')
+            subCats.addClass('disabled')
         }
     })
 
-    $(subCats).on('click', 'li', function() {
+    subCats.on('click', 'li', function() {
         let self = $(this)
+        catSlug = self.attr('data-name')
+
         self.addClass('active')
         self.siblings().removeClass('active')
-        catSlug = self.attr('data-name')
-        $(subCats).toggleClass('open')
+        subCats.toggleClass('open')
     })
 
-    $(searchBtn).on('click', function() {
+    searchBtn.on('click', function() {
         const chosenCat = $(subCats).children('.active').data('id')
         currentCat = chosenCat
         offset = 0
         updateResults( chosenCat )
     })
 
-    $(next).on('click', function() {
+    next.on('click', function() {
         offset = offset + 5
         updateResults( currentCat, offset )
     })
 
-    $(prev).on('click', function() {
+    prev.on('click', function() {
         offset = offset <= 0 ? 0 : offset - 5;
         updateResults( currentCat, offset )
     })
