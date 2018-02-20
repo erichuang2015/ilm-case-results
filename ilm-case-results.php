@@ -196,13 +196,13 @@ function print_results_page_list() {
     echo $string;
 }
 
-function ilm_ajax_scripts() {
+function ilm_case_results_scripts() {
 	if ( is_page_template('case-results.php') ) {
-		wp_enqueue_style('ilm-ajax-style', plugins_url( '/css/case-results.css', __FILE__ ), false, false, 'screen');
-		wp_enqueue_script('ilm-ajax', plugins_url( '/js/ilm-ajax-min.js', __FILE__ ), array('jquery'), null, true);
+		wp_enqueue_style('ilm-case-results-style', plugins_url( '/css/case-results.css', __FILE__ ), false, false, 'screen');
+		wp_enqueue_script('ilm-case-results', plugins_url( '/js/ilm-case-results-min.js', __FILE__ ), array('jquery'), null, true);
 	}
 }
-add_action('wp_enqueue_scripts', 'ilm_ajax_scripts');
+add_action('wp_enqueue_scripts', 'ilm_case_results_scripts');
 
 function ilm_register_case_results() {
 
