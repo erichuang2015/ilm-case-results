@@ -71,7 +71,7 @@
                         </div>
 
                         <div class="pagination">
-                            <a class="results-prev disabled">
+                            <a class="results-prev">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.6 19.8">
                                 <path fill="#1e2327" d="M.1 9.9H0l9.9 9.9.7-.7-9.2-9.2h.1-.1L3.3 8 10.6.7 9.9 0l-8 8L0 9.9z"/>
                             </svg>

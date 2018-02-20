@@ -30,7 +30,7 @@
     let totalPosts  = 0
     let resultCount = 5
 
-    const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/case_results'
+    const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/results'
 
     /*
     ** Get the total amount of posts so we know what we're
@@ -70,7 +70,8 @@
 
         $.ajax({
 
-            url: path + '?per_page=' +resultCount+ '&parent=' +category+ '&offset=' +offset,
+            url: path + '?per_page=' + resultCount + '&parent=' + category + '&offset=' + offset,
+            dataType: 'json',
 
             beforeSend: function() {
                 /*
@@ -95,30 +96,27 @@
                     html += '</article>'
                 }
 
-                $(container).html(html)
+                container.html(html)
             },
 
             complete: function() {
 
                 let url = ''
-                if ( offset ) {
-                    url = catSlug + '?offset=' + offset
-
-                    if ( offset === 0 ) {
-                        $(prev).addClass('disabled').hide()
-                    }
+                if ( offset !== 0 ) {
+                    url = '?cat=' + catSlug + '&offset=' + offset
+                    prev.removeClass('disabled')
 
                 } else {
-
-                    url = catSlug
-                    $(prev).removeClass('disabled').show()
-
+                    url = '?cat=' + catSlug
+                    prev.addClass('disabled')
                 }
 
-                history.pushState({catSlug: catSlug, offset: offset}, null, url)
+                history.pushState({cat: currentCat, offset: offset}, "", url)
             },
 
-            error: function() { /* console.log('DANGER, WILL ROBINSON!') */ }
+            error: function() {
+                console.log('AJAX request URL invalid or not found')
+            }
         })
     }
 
@@ -127,11 +125,9 @@
     ** we can support loading directly to results as well as updating
     ** results when forward/backward controls are used.
     */
-    window.addEventListener('popstate', function(e) {
-        if ( e.state === null ) {
-            updateResults()
-        } else {
-            updateResults( e.state.catSlug, e.state.offset )
+    window.addEventListener('load', function() {
+        if ( history.state ) {
+            updateResults( history.state.cat, history.state.offset )
         }
     })
 
@@ -172,7 +168,7 @@
     searchBtn.on('click', function() {
         const chosenCat = $(subCats).children('.active').data('id')
         currentCat = chosenCat
-        offset = 0
+        console.log('Attempting to load results from: ' + currentCat + ' (' + catSlug + ')')
         getTotalPosts( chosenCat )
         updateResults( chosenCat )
     })
