@@ -19,7 +19,8 @@
     const container = $('.results')
     const mainCats  = $('.main-cat')
     const subCats   = $('.sub-cat')
-    const searchBtn = $('#cr-search')
+    const secondary = $('.bottom-wrap .filters')
+    const featured  = $('.featured-category')
     const prev      = $('.results-prev')
     const next      = $('.results-next')
     const pageLinks = $('.pagination-numbers')
@@ -73,15 +74,6 @@
             url: path + '?per_page=' + resultCount + '&parent=' + category + '&offset=' + offset,
             dataType: 'json',
 
-            beforeSend: function() {
-                /*
-                ** Scroll the window down to results
-                */
-                $('html, body').animate({
-                    scrollTop: container.offset().top - 300
-                }, 1000)
-            },
-
             success: function( data ) {
                 /*
                 ** Create an empty var, assign string values to it
@@ -127,6 +119,7 @@
     */
     window.addEventListener('load', function() {
         if ( history.state ) {
+            secondary.addClass('active')
             updateResults( history.state.cat, history.state.offset )
         }
     })
@@ -134,7 +127,7 @@
     /*
     ** Handlers for two "dropdowns" and
     ** previous/next pagination buttons
-    ** Needs some refactoring
+    ** Needs much refactor. Wowe.
     */
     mainCats.on('click', 'li', function() {
         let self = $(this)
@@ -145,12 +138,19 @@
         mainCats.toggleClass('open')
 
         if ( self.attr('data-name') ) {
+            let displayName = self.text()
             currentCat = self.attr('data-id')
+            secondary.addClass('active')
+
+            featured.text(displayName)
 
             mainCats.attr('data-current', currentCat)
             subCats.removeClass('disabled')
             subCats.children('[data-parent!="' + currentCat + '"]').addClass('hidden')
             subCats.children('li:first-child').removeClass('hidden')
+
+            getTotalPosts( currentCat )
+            updateResults( currentCat )
         } else {
             subCats.addClass('disabled')
         }
@@ -158,19 +158,17 @@
 
     subCats.on('click', 'li', function() {
         let self = $(this)
+        let displayName = self.text()
+        featured.text(displayName)
         catSlug = self.attr('data-name')
+        currentCat = self.attr('data-id')
 
         self.addClass('active')
         self.siblings().removeClass('active')
         subCats.toggleClass('open')
-    })
 
-    searchBtn.on('click', function() {
-        const chosenCat = $(subCats).children('.active').data('id')
-        currentCat = chosenCat
-        console.log('Attempting to load results from: ' + currentCat + ' (' + catSlug + ')')
-        getTotalPosts( chosenCat )
-        updateResults( chosenCat )
+        getTotalPosts( currentCat )
+        updateResults( currentCat )
     })
 
     next.on('click', function() {

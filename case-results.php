@@ -1,15 +1,15 @@
 <?php get_header();?>
 
-	<div id="page-container" class="clearfix">
+	<div id="page-container" class="clearfix full-width">
 		<div class="main-content">
 			<?php if ( have_posts() ) : while ( have_posts() ) : the_post(); ?>
                 <div class="top-wrap">
                     <h1 class="page-title"><?php the_title();?></h1>
                     <div class="filters">
                         <div class="select-wrap">
-                            <p>Select a Main Practice Area</p>
+                            <p>Step 1: Select Main Practice Area</p>
                             <ul class="main-cat" data-current="none">
-                                <li>Select</li>
+                                <li class="view-all">View All</li>
                                 <?php
                                 /*
                                 ** Get pages that have no parent, which
@@ -62,12 +62,12 @@
                 </div>
                 <div class="bottom-wrap">
                     <div class="container">
-                        <p class="intro">// Top Featured Results</p>
+                        <p class="intro">Top Featured Results <span class="featured-category"></span></p>
                         <div class="filters">
                             <div class="select-wrap">
-                                <p>Select a Specific Practice Area</p>
+                                <p>Step 2: Select Specific Practice Area</p>
                                 <ul class="sub-cat disabled" data-current="none">
-                                    <li>Select</li>
+                                    <li class="view-all">View All</li>
                                     <?php echo $childPages; ?>
                                 </ul>
                             </div>
