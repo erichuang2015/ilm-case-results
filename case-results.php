@@ -11,6 +11,10 @@
                             <ul class="main-cat" data-current="none">
                                 <li>Select</li>
                                 <?php
+                                /*
+                                ** Get pages that have no parent, which
+                                ** means that they are top-level
+                                */
                                 $results = new WP_Query(array(
                                     'post_type' => 'case_results',
                                     'post_parent' => 0,
@@ -18,40 +22,56 @@
                                     'orderby' => 'title',
                                     'order' => 'ASC'
                                 ));
+
+                                /*
+                                ** Create a variable to hold child data
+                                */
                                 $childPages = '';
+
                                 if ( $results->have_posts() ) : while ( $results->have_posts() ) : $results->the_post();
+
+                                    /*
+                                    ** If this result has children, loop over them all
+                                    ** adding each to our empty variable of $childPages
+                                    ** to be used elsewhere in the layout
+                                    */
                                     $children = get_children(array( 'post_parent' => $post->ID ));
-                                    if ( $children ) : ?>
+                                    if ( $children ) :
 
-                                    <li data-name="<?php echo $post->post_name; ?>" data-id="<?php echo $post->ID; ?>"><?php the_title(); ?></li>
-                                        <?php
-
-                                            foreach ( $children as $child ) {
-                                                $childPages .= '<li data-name="'.$child->post_name.'" data-id="'.$child->ID.'" data-parent="'.$post->ID.'">';
-                                                $childPages .= get_the_title($child);
-                                                $childPages .= '</li>';
-                                            }
-                                        ?>
+                                        foreach ( $children as $child ) {
+                                            $childPages .= '<li data-name="'.$child->post_name.'"';
+                                            $childPages .= 'data-id="'.$child->ID.'"';
+                                            $childPages .= 'data-parent="'.$post->ID.'">';
+                                            $childPages .= get_the_title($child);
+                                            $childPages .= '</li>';
+                                        }
+                                    /*
+                                    ** After child data collection is done, output the parent
+                                    ** as a list item with some filter identifying attributes
+                                    */
+                                    ?>
+                                    <li data-name="<?php echo $post->post_name; ?>" data-id="<?php echo $post->ID; ?>">
+                                        <?php the_title(); ?>
+                                    </li>
 
                                     <?php endif; wp_reset_query(); ?>
                                 <?php endwhile; endif; ?>
                             </ul>
-                        </div>
-                        <div class="select-wrap">
-                            <p>Select a Specific Practice Area</p>
-                            <ul class="sub-cat disabled" data-current="none">
-                                <li>Select</li>
-                                <?php echo $childPages; ?>
-                            </ul>
-                        </div>
-                        <div class="select-wrap">
-                            <button id="cr-search" class="button">Search</button>
                         </div>
                     </div>
                 </div>
                 <div class="bottom-wrap">
                     <div class="container">
                         <p class="intro">// Top Featured Results</p>
+                        <div class="filters">
+                            <div class="select-wrap">
+                                <p>Select a Specific Practice Area</p>
+                                <ul class="sub-cat disabled" data-current="none">
+                                    <li>Select</li>
+                                    <?php echo $childPages; ?>
+                                </ul>
+                            </div>
+                        </div>
                         <div class="results">
                             <?php
                             $initial_results = new WP_Query(array(
@@ -59,7 +79,7 @@
                                 'post_parent' => 38,
                                 'posts_per_page' => 5,
                                 'orderby' => 'title',
-                                'order' => 'ASC'
+                                'order' => 'DESC'
                             ));
                             if ( $initial_results->have_posts() ) : while ( $initial_results->have_posts() ) : $initial_results->the_post();
                             ?>

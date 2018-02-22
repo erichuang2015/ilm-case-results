@@ -28,18 +28,8 @@
         max-width: 110rem;
         margin: 5rem auto;
 
-        @include mq('1400') {
-            display: flex;
-            justify-content: space-between;
-        }
-
         .select-wrap {
             position: relative;
-
-            @include mq('1400') {
-                flex: 0 1 39%;
-                margin-bottom: 0;
-            }
 
             &::after {
                 position: absolute;
@@ -52,29 +42,12 @@
                 z-index: 5;
             }
 
-            &:last-child {
-                @include mq('1400') {
-                    flex-basis: 20%;
-                }
-
-                &::after {
-                    display: none;
-                }
-            }
-
             p {
                 font-family: "Roboto", sans-serif;
                 font-weight: 800;
                 font-size: 1.4rem;
                 letter-spacing: .3rem;
                 text-transform: uppercase;
-            }
-
-            button {
-                margin-top: 3rem;
-                border: 0;
-                cursor: pointer;
-                width: 100%;
             }
         }
 
