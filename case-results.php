@@ -9,7 +9,7 @@
                         <div class="select-wrap">
                             <p>Step 1: Select Main Practice Area</p>
                             <ul class="main-cat" data-current="none">
-                                <li class="view-all">View All</li>
+                                <li class="view-all active">View All</li>
                                 <?php
                                 /*
                                 ** Get pages that have no parent, which
@@ -67,7 +67,7 @@
                             <div class="select-wrap">
                                 <p>Step 2: Select Specific Practice Area</p>
                                 <ul class="sub-cat disabled" data-current="none">
-                                    <li class="view-all">View All</li>
+                                    <li class="view-all active">View All</li>
                                     <?php echo $childPages; ?>
                                 </ul>
                             </div>

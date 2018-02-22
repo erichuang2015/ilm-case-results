@@ -30,6 +30,7 @@
     let offset      = 0
     let totalPosts  = 0
     let resultCount = 5
+    let catNameDisplay = ''
 
     const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/results'
 
@@ -37,36 +38,88 @@
     ** Get the total amount of posts so we know what we're
     ** Dealing with when it comes to offsets, etc.
     */
-    function getTotalPosts( cat ) {
+    const getTotalPosts = ( cat ) => {
         $.getJSON(path + '?parent=' +cat, postTotalCallback)
     }
 
-    function postTotalCallback( data ) {
+    const postTotalCallback = ( data ) => {
         totalPosts = data.length
         createPagination()
     }
 
-    function createPagination() {
-        let container = $('.pagination-numbers')
-        let amountOfLinks = parseFloat( totalPosts / resultCount )
-        let html = ''
+    const updateCurrentCategory = ( el ) => {
+        currentCat = el.attr('data-id')
+    }
 
-        container.empty()
+    const updateCatSlug = ( el ) => {
+        catSlug = el.attr('data-name')
+    }
+
+    const updateCatNameDisplay = ( el ) => {
+        catNameDisplay = el.text()
+        featured.text( catNameDisplay )
+    }
+
+    const processCategory = ( el ) => {
+        el.addClass('active')
+        el.siblings().removeClass('active')
+
+        updateCatSlug( el )
+        updateCatNameDisplay( el )
+        updateCurrentCategory( el )
+
+        getTotalPosts( currentCat )
+        updateResults( currentCat )
+    }
+
+    const resetSubCategories = () => {
+        subCats.children().attr('class', '')
+        subCats.children('[data-parent!="' + currentCat + '"]').addClass('hidden')
+        subCats.children('li:first-child').removeClass('hidden')
+    }
+
+    const mainCatSelected = ( el ) => {
+
+        processCategory( el )
+
+        mainCats.attr('data-current', currentCat)
+        secondary.addClass('active')
+        subCats.removeClass('disabled')
+
+        resetSubCategories()
+    }
+
+    const subCatSelected = ( el ) => {
+        processCategory( el )
+    }
+
+    const resetFilters = () => {
+        mainCats.children().removeClass('active')
+        subCats.addClass('disabled')
+        subCats.children().removeClass('active')
+    }
+
+    const createPagination = () => {
+
+        let paginationContainer = $('.pagination-numbers')
+        let amountOfLinks       = parseFloat( totalPosts / resultCount )
+        let paginationHtml      = ''
+
+        paginationContainer.empty()
 
         if ( amountOfLinks < 1 ) {
-            html += '<a href="#" data-page="1" class="page-number active">1</a>'
+            paginationHtml += '<a href="#" data-page="1" class="page-number active">1</a>'
         }
 
         else {
             for ( var i = 1; i <= amountOfLinks; i++ ) {
-                html += '<a href="#" data-page="' + i + '" class="page-number">' + i + '</a>'
+                paginationHtml += '<a href="#" data-page="' + i + '" class="page-number">' + i + '</a>'
             }
         }
 
-        container.html(html)
+        paginationContainer.html( paginationHtml )
     }
 
-    // Default offset is zero and is not a required param
     const updateResults = ( category = currentCat, offset = 0 ) => {
 
         $.ajax({
@@ -79,31 +132,33 @@
                 ** Create an empty var, assign string values to it
                 ** and output only once after all data has been looped
                 */
-                let html = ''
+                let resultsHTML = ''
 
                 for ( let result of data ) {
-                    html += '<article class="case-result">'
-                    html += '<h2 class="post-title">' + result.title.rendered + '</h2>'
-                    html += result.content.rendered
-                    html += '</article>'
+                    resultsHTML += '<article class="case-result">'
+                    resultsHTML += '<h2 class="post-title">' + result.title.rendered + '</h2>'
+                    resultsHTML += result.content.rendered
+                    resultsHTML += '</article>'
                 }
 
-                container.html(html)
+                container.html( resultsHTML )
             },
 
             complete: function() {
 
-                let url = ''
-                if ( offset !== 0 ) {
-                    url = '?cat=' + catSlug + '&offset=' + offset
-                    prev.removeClass('disabled')
+                let resultsURL = ''
 
-                } else {
-                    url = '?cat=' + catSlug
+                if ( offset !== 0 ) {
+                    resultsURL = '?cat=' + catSlug + '&offset=' + offset
+                    prev.removeClass('disabled')
+                }
+
+                else {
+                    resultsURL = '?cat=' + catSlug
                     prev.addClass('disabled')
                 }
 
-                history.pushState({cat: currentCat, offset: offset}, "", url)
+                history.pushState({ cat: currentCat, offset: offset }, "", resultsURL)
             },
 
             error: function() {
@@ -130,45 +185,46 @@
     ** Needs much refactor. Wowe.
     */
     mainCats.on('click', 'li', function() {
-        let self = $(this)
 
-        self.addClass('active')
-        self.siblings().removeClass('active')
-        subCats.children('.hidden').removeClass('hidden')
         mainCats.toggleClass('open')
 
+        let self = $(this)
+
+        /*
+        ** Only fire if element has a name, indicating
+        ** that it is a category and not the default
+        ** "View All" list item
+        */
         if ( self.attr('data-name') ) {
-            let displayName = self.text()
-            currentCat = self.attr('data-id')
-            secondary.addClass('active')
 
-            featured.text(displayName)
+            /*
+            ** Only fire an update if this is
+            ** not the currently active category
+            */
+            if ( !self.hasClass('active') ) {
+                mainCatSelected( self )
+            }
 
-            mainCats.attr('data-current', currentCat)
-            subCats.removeClass('disabled')
-            subCats.children('[data-parent!="' + currentCat + '"]').addClass('hidden')
-            subCats.children('li:first-child').removeClass('hidden')
-
-            getTotalPosts( currentCat )
-            updateResults( currentCat )
         } else {
-            subCats.addClass('disabled')
+            resetFilters()
         }
     })
 
     subCats.on('click', 'li', function() {
         let self = $(this)
-        let displayName = self.text()
-        featured.text(displayName)
-        catSlug = self.attr('data-name')
-        currentCat = self.attr('data-id')
 
-        self.addClass('active')
-        self.siblings().removeClass('active')
         subCats.toggleClass('open')
 
-        getTotalPosts( currentCat )
-        updateResults( currentCat )
+        /*
+        ** Same requirements to fire as main cat
+        */
+        if ( self.attr('data-name') ) {
+
+            if ( !self.hasClass('active') ) {
+                subCatSelected( self )
+            }
+
+        }
     })
 
     next.on('click', function() {
