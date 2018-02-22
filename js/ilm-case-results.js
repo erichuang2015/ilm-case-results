@@ -60,10 +60,14 @@
         featured.text( catNameDisplay )
     }
 
-    const processCategory = ( el ) => {
+    const activeCategory = ( el ) => {
         el.addClass('active')
         el.siblings().removeClass('active')
+    }
 
+    const processCategory = ( el ) => {
+
+        activeCategory( el )
         updateCatSlug( el )
         updateCatNameDisplay( el )
         updateCurrentCategory( el )
@@ -120,6 +124,39 @@
         paginationContainer.html( paginationHtml )
     }
 
+    const updateResultsHTML = ( data ) => {
+        /*
+        ** Create an empty var, assign string values to it
+        ** and output only once after all data has been looped
+        */
+        let resultsHTML = ''
+
+        for ( let result of data ) {
+            resultsHTML += '<article class="case-result">'
+            resultsHTML += '<h2 class="post-title">' + result.title.rendered + '</h2>'
+            resultsHTML += result.content.rendered
+            resultsHTML += '</article>'
+        }
+
+        container.html( resultsHTML )
+    }
+
+    const resultsUpdateComplete = () => {
+        let resultsURL = ''
+
+        if ( offset !== 0 ) {
+            resultsURL = '?cat=' + catSlug + '&offset=' + offset
+            prev.removeClass('disabled')
+        }
+
+        else {
+            resultsURL = '?cat=' + catSlug
+            prev.addClass('disabled')
+        }
+
+        history.pushState({ cat: currentCat, offset: offset }, "", resultsURL)
+    }
+
     const updateResults = ( category = currentCat, offset = 0 ) => {
 
         $.ajax({
@@ -128,37 +165,11 @@
             dataType: 'json',
 
             success: function( data ) {
-                /*
-                ** Create an empty var, assign string values to it
-                ** and output only once after all data has been looped
-                */
-                let resultsHTML = ''
-
-                for ( let result of data ) {
-                    resultsHTML += '<article class="case-result">'
-                    resultsHTML += '<h2 class="post-title">' + result.title.rendered + '</h2>'
-                    resultsHTML += result.content.rendered
-                    resultsHTML += '</article>'
-                }
-
-                container.html( resultsHTML )
+                updateResultsHTML( data )
             },
 
             complete: function() {
-
-                let resultsURL = ''
-
-                if ( offset !== 0 ) {
-                    resultsURL = '?cat=' + catSlug + '&offset=' + offset
-                    prev.removeClass('disabled')
-                }
-
-                else {
-                    resultsURL = '?cat=' + catSlug
-                    prev.addClass('disabled')
-                }
-
-                history.pushState({ cat: currentCat, offset: offset }, "", resultsURL)
+                resultsUpdateComplete()
             },
 
             error: function() {
