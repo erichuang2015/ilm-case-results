@@ -1,6 +1,27 @@
-<?php get_header();?>
+<?php get_header(); ?>
 
-	<div id="page-container" class="clearfix full-width">
+    <?php
+    /*
+    ** Check if category and offset values are present
+    ** If so, apply them to the HTML to be read in JS
+    */
+
+    if ( isset( $_GET['cat'] ) ) {
+        $category = $_GET['cat'];
+    }
+
+    if ( isset( $_GET['offset'] ) ) {
+        $offset = $_GET['offset'];
+    }
+    ?>
+    <div
+        id="page-container"
+        class="clearfix full-width"
+        <?php
+        if ( $category ) { echo 'data-cat="' . $category . '"'; }
+        if ( $offset ) { echo ' data-offset="' . $offset . '"'; }
+        ?>
+    >
 		<div class="main-content">
 			<?php if ( have_posts() ) : while ( have_posts() ) : the_post(); ?>
                 <div class="top-wrap">

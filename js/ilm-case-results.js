@@ -24,13 +24,15 @@
     const prev      = $('.results-prev')
     const next      = $('.results-next')
     const pageLinks = $('.pagination-numbers')
+    const selectBox = $('.select-wrap ul')
 
-    let currentCat  = '38' // Magic Number, ID of default category
-    let catSlug     = 'medical-malpractice' // Magic name!
-    let offset      = 0
-    let totalPosts  = 0
-    let resultCount = 5
-    let catNameDisplay = ''
+    let currentCat      = '38' // Magic Number, ID of default category
+    let catSlug         = 'medical-malpractice' // Magic name!
+    let offset          = 0
+    let totalPosts      = 0
+    let resultCount     = 5
+    let catNameDisplay  = ''
+    let resultsURL      = ''
 
     const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/results'
 
@@ -38,34 +40,34 @@
     ** Get the total amount of posts so we know what we're
     ** Dealing with when it comes to offsets, etc.
     */
-    const getTotalPosts = ( cat ) => {
+    const getTotalPosts = cat => {
         $.getJSON(path + '?parent=' +cat, postTotalCallback)
     }
 
-    const postTotalCallback = ( data ) => {
+    const postTotalCallback = data => {
         totalPosts = data.length
         createPagination()
     }
 
-    const updateCurrentCategory = ( el ) => {
+    const updateCurrentCategory = el => {
         currentCat = el.attr('data-id')
     }
 
-    const updateCatSlug = ( el ) => {
+    const updateCatSlug = el => {
         catSlug = el.attr('data-name')
     }
 
-    const updateCatNameDisplay = ( el ) => {
+    const updateCatNameDisplay = el => {
         catNameDisplay = el.text()
         featured.text( catNameDisplay )
     }
 
-    const activeCategory = ( el ) => {
+    const activeCategory = el => {
         el.addClass('active')
         el.siblings().removeClass('active')
     }
 
-    const processCategory = ( el ) => {
+    const processCategory = el => {
 
         activeCategory( el )
         updateCatSlug( el )
@@ -74,6 +76,7 @@
 
         getTotalPosts( currentCat )
         updateResults( currentCat )
+
     }
 
     const resetSubCategories = () => {
@@ -82,7 +85,7 @@
         subCats.children('li:first-child').removeClass('hidden')
     }
 
-    const mainCatSelected = ( el ) => {
+    const mainCatSelected = el => {
 
         processCategory( el )
 
@@ -93,7 +96,7 @@
         resetSubCategories()
     }
 
-    const subCatSelected = ( el ) => {
+    const subCatSelected = el => {
         processCategory( el )
     }
 
@@ -124,7 +127,7 @@
         paginationContainer.html( paginationHtml )
     }
 
-    const updateResultsHTML = ( data ) => {
+    const updateResultsHTML = data => {
         /*
         ** Create an empty var, assign string values to it
         ** and output only once after all data has been looped
@@ -142,7 +145,7 @@
     }
 
     const resultsUpdateComplete = () => {
-        let resultsURL = ''
+        resultsURL = ''
 
         if ( offset !== 0 ) {
             resultsURL = '?cat=' + catSlug + '&offset=' + offset
@@ -153,16 +156,25 @@
             resultsURL = '?cat=' + catSlug
             prev.addClass('disabled')
         }
+    }
 
-        history.pushState({ cat: currentCat, offset: offset }, "", resultsURL)
+    const allCaseResults = () => {
+        $.ajax({
+            url: path + '?per_page=100',
+            success: function( data ) {
+                updateResultsHTML( data )
+            },
+
+            error: function() {
+                console.log('AJAX request URL invalid or not found')
+            }
+        })
     }
 
     const updateResults = ( category = currentCat, offset = 0 ) => {
 
         $.ajax({
-
             url: path + '?per_page=' + resultCount + '&parent=' + category + '&offset=' + offset,
-            dataType: 'json',
 
             success: function( data ) {
                 updateResultsHTML( data )
@@ -179,27 +191,13 @@
     }
 
     /*
-    ** Using a combination of popstate listeners and the History API
-    ** we can support loading directly to results as well as updating
-    ** results when forward/backward controls are used.
+    ** Event Handlers
     */
-    window.addEventListener('load', function() {
-        if ( history.state ) {
-            secondary.addClass('active')
-            updateResults( history.state.cat, history.state.offset )
-        }
-    })
 
-    /*
-    ** Handlers for two "dropdowns" and
-    ** previous/next pagination buttons
-    ** Needs much refactor. Wowe.
-    */
-    mainCats.on('click', 'li', function() {
-
-        mainCats.toggleClass('open')
+    selectBox.on('click', 'li', function() {
 
         let self = $(this)
+        self.parent().toggleClass('open')
 
         /*
         ** Only fire if element has a name, indicating
@@ -213,48 +211,56 @@
             ** not the currently active category
             */
             if ( !self.hasClass('active') ) {
-                mainCatSelected( self )
+
+                if ( self.parent().hasClass('main-cat') ) {
+                    mainCatSelected( self )
+                } else {
+                    subCatSelected( self )
+                }
             }
 
         } else {
-            resetFilters()
-        }
-    })
 
-    subCats.on('click', 'li', function() {
-        let self = $(this)
-
-        subCats.toggleClass('open')
-
-        /*
-        ** Same requirements to fire as main cat
-        */
-        if ( self.attr('data-name') ) {
-
-            if ( !self.hasClass('active') ) {
-                subCatSelected( self )
+            /*
+            ** If this is the main category list and
+            ** "View All" is the target, then reset
+            */
+            if ( self.parent().hasClass('main-cat') ) {
+                resetFilters()
             }
-
         }
     })
 
+    /*
+    ** If the offset is greater than or equal
+    ** to totalPosts then stop, else add to it
+    */
     next.on('click', function() {
-        offset = offset + 5
+        offset = offset >= totalPosts ? totalPosts : offset + resultCount
         updateResults( currentCat, offset )
     })
 
+    /*
+    ** If the offset is less than or equal to zero
+    ** Then keep it at zero, else subtract from it
+    */
     prev.on('click', function() {
-        offset = offset <= 0 ? 0 : offset - 5;
+        offset = offset <= 0 ? 0 : offset - resultCount
         updateResults( currentCat, offset )
     })
 
+    /*
+    ** Pagination Numbers
+    ** Figure out which offset to apply
+    ** by comparing page to offset values
+    */
     pageLinks.on('click', 'a', function(e) {
         e.preventDefault()
         let self = $(this)
         let pageNum = self.attr('data-page')
 
         offset = parseInt(resultCount * parseInt(pageNum-1))
-        updateResults( currentCat, offset)
+        updateResults( currentCat, offset )
     })
 
 // @ts-ignore
