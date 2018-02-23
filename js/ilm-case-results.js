@@ -25,6 +25,7 @@
     const next      = $('.results-next')
     const pageLinks = $('.pagination-numbers')
     const selectBox = $('.select-wrap ul')
+    const pageCont  = $('#page-container')
 
     let currentCat      = ''
     let catSlug         = ''
@@ -37,8 +38,42 @@
     let resultsURL      = ''
     let allCategories   = true
     let parentCategory  = true
+    let externalSource  = false
 
     const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/results'
+
+    if ( $('#page-container[data-cat]').length ) {
+        externalSource = true
+        console.log( 'External Referrer' )
+
+        /*
+        ** Get the category name of the query string and match
+        ** it to an ID of a list item in the select-wrap,
+        ** then apply the ID to the original container
+        */
+        let catName = $('#page-container').attr('data-cat')
+        catSlug = catName
+        currentCat = $('li[data-name="' + catName + '"]').attr('data-id')
+        pageCont.attr('data-id', currentCat)
+        $('.disabled').removeClass('disabled')
+
+        let selectedItem = $('li[data-name="'+catName+'"]')
+            selectedItem.addClass('active')
+            selectedItem.siblings('.active').removeClass('active')
+
+        let selectedParentID = selectedItem.attr('data-parent')
+        let selectedParent = $('.main-cat li[data-id="'+selectedParentID+'"]')
+            selectedParent.addClass('active')
+            selectedParent.siblings('.active').removeClass('active')
+
+        featured.text( selectedItem.text() )
+
+        if ( $('#page-container[data-offset]').length ) {
+            offset = $('#page-container').attr('data-offset')
+        } else {
+            offset = 0
+        }
+    }
 
     /*
     ** Get the total amount of posts so we know what we're
@@ -48,8 +83,8 @@
         $.getJSON(path + '?per_page=100', postTotalCallback)
     }
 
-    const getTotalPosts = cat => {
-        $.getJSON(path + '?parent=' +cat, postTotalCallback)
+    const getTotalPosts = ( cat ) => {
+        $.getJSON(path + '?per_page=100&parent=' +cat, postTotalCallback)
     }
 
     const postTotalCallback = data => {
@@ -67,19 +102,22 @@
 
             $('li[data-parent^='+currentCat+']').each(function() {
                 let self = $(this)
-                children += ', '
+                children += ','
                 children += self.attr('data-id')
             })
 
             currentList = children
+            pageCont.attr('data-id', currentList)
         }
         else {
             currentCat = el.attr('data-id')
+            pageCont.attr('data-id', currentCat)
         }
     }
 
     const updateCatSlug = el => {
         catSlug = el.attr('data-name')
+        pageCont.attr('data-name', catSlug)
     }
 
     const updateCatNameDisplay = el => {
@@ -100,13 +138,8 @@
         updateCurrentCategory( el )
 
         getTotalPosts( currentCat )
-
-        if ( parentCategory ) {
-            updateResults( currentList )
-        } else {
-            updateResults( currentCat )
-        }
-
+        createPagination()
+        updateResults( currentCat )
 
     }
 
@@ -120,16 +153,16 @@
 
         allCategories = false
         parentCategory = true
+        pageCont.attr('data-offset', '0')
         processCategory( el )
 
-        mainCats.attr('data-current', currentCat)
         subCats.removeClass('disabled')
-
         resetSubCategories()
     }
 
     const subCatSelected = el => {
         parentCategory = false
+        pageCont.attr('data-offset', '0')
         processCategory( el )
     }
 
@@ -145,7 +178,7 @@
         }
 
         getTotalCPT()
-        allCaseResults()
+        updateResults()
     }
 
     /*
@@ -171,11 +204,7 @@
 
         else {
             for ( var i = 1; i <= amountOfLinks; i++ ) {
-                if ( i === 1 ) {
-                    paginationHtml += '<a href="#" data-page="' + i + '" class="page-number active">' + i + '</a>'
-                } else {
-                    paginationHtml += '<a href="#" data-page="' + i + '" class="page-number">' + i + '</a>'
-                }
+                paginationHtml += '<a href="#" data-page="' + i + '" class="page-number">' + i + '</a>'
             }
         }
 
@@ -203,6 +232,7 @@
 
     const resultsUpdateComplete = () => {
         resultsURL = ''
+        offset = parseInt(pageCont.attr('data-offset'))
 
         if ( offset !== 0 ) {
             resultsURL = '?cat=' + catSlug + '&offset=' + offset
@@ -213,61 +243,65 @@
             resultsURL = '?cat=' + catSlug
             prev.addClass('disabled')
         }
+
+        history.pushState(
+            {
+            catSlug: catSlug,
+            catID: currentCat,
+            offset: offset
+            },
+            "",
+            resultsURL
+        )
     }
 
-    const allCaseResults = () => {
-        $.ajax({
-            url: path + '?per_page=' + resultCount,
-            success: function( data ) {
-                updateResultsHTML( data )
-            },
+    const updateResults = () => {
 
-            error: function() {
-                console.log('AJAX request URL invalid or not found')
-            }
-        })
-    }
+        let category    = pageCont.attr('data-id')
+        let offset      = pageCont.attr('data-offset')
 
-    const updateAllCaseResults = ( offset = 0 ) => {
-
-        $.ajax({
-            url: path + '?per_page=' + resultCount + '&offset=' + offset,
-
-            success: function( data ) {
-                updateResultsHTML( data )
-            },
-
-            complete: function() {
-                resultsUpdateComplete()
-            },
-
-            error: function() {
-                console.log('AJAX request URL invalid or not found')
-            }
-        })
-    }
-
-    const updateResults = ( category = currentCat, offset = 0 ) => {
-
-        if ( parentCategory ) {
-            category = children
+        if ( pageCont.attr('data-offset') ) {
+            offset = pageCont.attr('data-offset')
         }
 
-        $.ajax({
-            url: path + '?per_page=' + resultCount + '&parent=' + category + '&offset=' + offset,
+        if ( category === undefined || category === 'undefined' ) {
 
-            success: function( data ) {
-                updateResultsHTML( data )
-            },
+            $.ajax({
+                url: path + '?per_page=' + resultCount + '&offset=' + offset,
 
-            complete: function() {
-                resultsUpdateComplete()
-            },
+                beforeSend: function() {
+                    featured.empty()
+                    if ( secondary.is(':visible') ) {
+                        secondary.slideToggle()
+                    }
+                },
 
-            error: function() {
-                console.log('AJAX request URL invalid or not found')
-            }
-        })
+                success: function( data ) {
+                    updateResultsHTML( data )
+                },
+
+                error: function() {
+                    console.log('AJAX request URL invalid or not found')
+                }
+            })
+
+        } else {
+            $.ajax({
+                url: path + '?per_page=' + resultCount + '&parent=' + category + '&offset=' + offset,
+
+                success: function( data ) {
+                    updateResultsHTML( data )
+                },
+
+                complete: function() {
+                    resultsUpdateComplete()
+                },
+
+                error: function() {
+                    console.log('AJAX request URL invalid or not found')
+                }
+            })
+        }
     }
 
     /*
@@ -277,14 +311,19 @@
     selectBox.on('click', 'li', function() {
 
         let self = $(this)
+
+        if ( externalSource ) {
+            externalSource = false
+        }
+
         self.parent().toggleClass('open')
 
         /*
-        ** Only fire if element has a name, indicating
-        ** that it is a category and not the default
-        ** "View All" list item
+        ** Only fire if element has not first,
+        ** indicating that it is a category and
+        ** not the default "View All" list item
         */
-        if ( self.attr('data-name') ) {
+        if ( self.not(':first-child') ) {
 
             /*
             ** Only fire an update if this is
@@ -293,11 +332,13 @@
             if ( !self.hasClass('active') ) {
 
                 if ( self.parent().hasClass('main-cat') ) {
+
                     mainCatSelected( self )
 
                     if ( !secondary.is(':visible') ) {
                         secondary.slideToggle()
                     }
+
                 } else {
                     subCatSelected( self )
                 }
@@ -306,7 +347,6 @@
         } else {
 
             /*
-            ** If this is the main category list and
             ** "View All" is the target, then reset
             */
             if ( self.parent().hasClass('main-cat') ) {
@@ -321,13 +361,10 @@
     */
     next.on('click', function() {
         offset = offset >= totalPosts ? totalPosts : offset + resultCount
+        pageCont.attr('data-offset', offset)
         scrollUp()
 
-        if ( allCategories ) {
-            updateAllCaseResults( offset )
-        } else {
-            updateResults( currentCat, offset )
-        }
+        updateResults()
     })
 
     /*
@@ -336,13 +373,10 @@
     */
     prev.on('click', function() {
         offset = offset <= 0 ? 0 : offset - resultCount
+        pageCont.attr('data-offset', offset)
         scrollUp()
 
-        if ( allCategories ) {
-            updateAllCaseResults( offset )
-        } else {
-            updateResults( currentCat, offset )
-        }
+        updateResults()
     })
 
     /*
@@ -354,18 +388,37 @@
         e.preventDefault()
         let self = $(this)
         let pageNum = self.attr('data-page')
+
         self.siblings().removeClass('active')
         self.toggleClass('active')
-        offset = parseInt(resultCount * parseInt(pageNum-1))
-        scrollUp()
 
-        if ( allCategories ) {
-            updateAllCaseResults( offset )
-        } else {
-            updateResults( currentCat, offset )
-        }
+        offset = parseInt(resultCount * parseInt(pageNum-1))
+        pageCont.attr('data-offset', offset)
+
+        scrollUp()
+        updateResults()
     })
 
-    resetFilters()
+    /*
+    ** This runs on page load. If user got here
+    ** with a direct URL, PHP should load attr's
+    ** we check to know that and run the update.
+    ** Otherwise, load all results.
+    */
+    if ( !externalSource ) {
+
+        resetFilters()
+
+    } else {
+
+        allCategories = false
+        parentCategory = false
+        updateResults()
+
+        if ( !secondary.is(':visible') ) {
+            secondary.slideToggle()
+        }
+
+    }
 // @ts-ignore
 })(jQuery)
