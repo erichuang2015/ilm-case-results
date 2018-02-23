@@ -6,8 +6,9 @@
 ** conflict-free with any other javascript libraries that might also use `$`.
 ** Due to the nature of IIFE, all functions/vars are private.
 */
-
 ;(function($) {
+
+    'use strict'
 
     /*
     ** The CR template (case-results.php) loads using the WordPress loop, showing
@@ -42,9 +43,7 @@
 
     const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/results'
 
-    if ( $('#page-container[data-cat]').length ) {
-        externalSource = true
-        console.log( 'External Referrer' )
+    const externalRefferal = () => {
 
         /*
         ** Get the category name of the query string and match
@@ -52,10 +51,10 @@
         ** then apply the ID to the original container
         */
         let catName = $('#page-container').attr('data-cat')
+
         catSlug = catName
         currentCat = $('li[data-name="' + catName + '"]').attr('data-id')
         pageCont.attr('data-id', currentCat)
-        $('.disabled').removeClass('disabled')
 
         let selectedItem = $('li[data-name="'+catName+'"]')
             selectedItem.addClass('active')
@@ -67,9 +66,10 @@
             selectedParent.siblings('.active').removeClass('active')
 
         featured.text( selectedItem.text() )
+        $('.disabled').removeClass('disabled')
 
         if ( $('#page-container[data-offset]').length ) {
-            offset = $('#page-container').attr('data-offset')
+            offset = parseInt($('#page-container').attr('data-offset'))
         } else {
             offset = 0
         }
@@ -405,6 +405,11 @@
     ** we check to know that and run the update.
     ** Otherwise, load all results.
     */
+    if ( $('#page-container[data-cat]').length ) {
+        externalSource = true
+        externalRefferal()
+    }
+
     if ( !externalSource ) {
 
         resetFilters()
@@ -420,5 +425,5 @@
         }
 
     }
-// @ts-ignore
+
 })(jQuery)
