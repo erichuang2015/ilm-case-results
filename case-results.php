@@ -56,7 +56,9 @@
                                     ** adding each to our empty variable of $childPages
                                     ** to be used elsewhere in the layout
                                     */
-                                    $children = get_children(array( 'post_parent' => $post->ID ));
+                                    $children = get_children(array(
+                                        'post_parent' => $post->ID
+                                    ));
                                     if ( $children ) :
 
                                         foreach ( $children as $child ) {
@@ -93,23 +95,8 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="results">
-                            <?php
-                            $initial_results = new WP_Query(array(
-                                'post_type' => 'case_results',
-                                'post_parent' => 38,
-                                'posts_per_page' => 5,
-                                'orderby' => 'title',
-                                'order' => 'DESC'
-                            ));
-                            if ( $initial_results->have_posts() ) : while ( $initial_results->have_posts() ) : $initial_results->the_post();
-                            ?>
-                            <article class="case-result">
-                                <h2 class="post-title"><?php the_title(); ?></h2>
-                                <?php the_content(); ?>
-                            </article>
-                        <?php endwhile; endif; ?>
-                        </div>
+
+                        <div class="results"></div>
 
                         <div class="pagination">
                             <a class="results-prev">
