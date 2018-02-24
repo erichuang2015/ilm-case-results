@@ -264,28 +264,7 @@
             offset = pageCont.attr('data-offset')
         }
 
-        if ( allCategories ) {
-            $.ajax({
-                url: path + '?per_page=' + resultCount,
-
-                beforeSend: function() {
-                    featured.empty()
-                    if ( secondary.is(':visible') ) {
-                        secondary.slideToggle()
-                    }
-                },
-
-                success: function( data ) {
-                    updateResultsHTML( data )
-                },
-
-                error: function() {
-                    console.log('AJAX request URL invalid or not found')
-                }
-            })
-        }
-
-        else if ( category === undefined || category === 'undefined' ) {
+        if ( category === undefined || category === 'undefined' || allCategories ) {
 
             $.ajax({
                 url: path + '?per_page=' + resultCount,
