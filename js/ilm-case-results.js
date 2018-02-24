@@ -264,10 +264,9 @@
             offset = pageCont.attr('data-offset')
         }
 
-        if ( category === undefined || category === 'undefined' ) {
-
+        if ( allCategories ) {
             $.ajax({
-                url: path + '?per_page=' + resultCount + '&offset=' + offset,
+                url: path + '?per_page=' + resultCount,
 
                 beforeSend: function() {
                     featured.empty()
@@ -284,8 +283,31 @@
                     console.log('AJAX request URL invalid or not found')
                 }
             })
+        }
 
-        } else {
+        else if ( category === undefined || category === 'undefined' ) {
+
+            $.ajax({
+                url: path + '?per_page=' + resultCount,
+
+                beforeSend: function() {
+                    featured.empty()
+                    if ( secondary.is(':visible') ) {
+                        secondary.slideToggle()
+                    }
+                },
+
+                success: function( data ) {
+                    updateResultsHTML( data )
+                },
+
+                error: function() {
+                    console.log('AJAX request URL invalid or not found')
+                }
+            })
+        }
+
+        else {
             $.ajax({
                 url: path + '?per_page=' + resultCount + '&parent=' + category + '&offset=' + offset,
 
