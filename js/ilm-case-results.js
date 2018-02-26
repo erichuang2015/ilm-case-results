@@ -267,7 +267,7 @@
         if ( category === undefined || category === 'undefined' || allCategories ) {
 
             $.ajax({
-                url: path + '?per_page=' + resultCount,
+                url: path + '?order=asc&per_page=' + resultCount,
 
                 beforeSend: function() {
                     featured.empty()
@@ -288,7 +288,7 @@
 
         else {
             $.ajax({
-                url: path + '?per_page=' + resultCount + '&parent=' + category + '&offset=' + offset,
+                url: path + '?order=asc&per_page=' + resultCount + '&parent=' + category + '&offset=' + offset,
 
                 success: function( data ) {
                     updateResultsHTML( data )
