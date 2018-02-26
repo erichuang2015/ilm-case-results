@@ -267,7 +267,7 @@
         if ( category === undefined || category === 'undefined' || allCategories ) {
 
             $.ajax({
-                url: path + '?order=asc&per_page=' + resultCount,
+                url: path + '?per_page=' + resultCount,
 
                 beforeSend: function() {
                     featured.empty()
@@ -280,8 +280,8 @@
                     updateResultsHTML( data )
                 },
 
-                error: function() {
-                    console.log('AJAX request URL invalid or not found')
+                error: function( settings ) {
+                    console.log('AJAX request URL invalid or not found: ', settings.url)
                 }
             })
         }
