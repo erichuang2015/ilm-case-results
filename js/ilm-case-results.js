@@ -17,15 +17,15 @@
     ** have been used, avoiding hard reloads.
     */
 
-   const container = $('.results')
-   const mainCats  = $('.main-cat')
-   const subCats   = $('.sub-cat')
-   const secondary = $('.bottom-wrap .filters')
-   const featured  = $('.featured-category')
-   const prev      = $('.results-prev')
-   const next      = $('.results-next')
-   const pageLinks = $('.pagination-numbers')
-   const selectBox = $('.select-wrap ul')
+    const container = $('.results')
+    const mainCats  = $('.main-cat')
+    const subCats   = $('.sub-cat')
+    const secondary = $('.bottom-wrap .filters')
+    const featured  = $('.featured-category')
+    const prev      = $('.results-prev')
+    const next      = $('.results-next')
+    const pageLinks = $('.pagination-numbers')
+    const selectBox = $('.select-wrap ul')
     const pageCont = $('#page-container')
 
     let currentCat      = ''
@@ -96,8 +96,24 @@
         for ( let result of data ) {
             if ( result.content.rendered !== '' ) {
             resultsHTML += '<article class="case-result">'
-            resultsHTML += '<h2 class="post-title">' + result.title.rendered + '</h2>'
-            resultsHTML += result.content.rendered
+            resultsHTML += '<div class="left">'
+                resultsHTML += '<div class="text-wrap">'
+                    resultsHTML += '<p class="amount">' + result.acf.case_result_amount + '</p>'
+                    resultsHTML += '<small>' + result.acf.case_result_type + '</small>'
+                resultsHTML += '</div>'
+            resultsHTML += '</div>'
+            resultsHTML += '<div class="right">'
+                resultsHTML += '<h3 class="highlight">' + result.acf.case_highlight + '</h2>'
+                resultsHTML += '<p>' + result.content.rendered + ' '
+                resultsHTML += '<cite>&bull; ' + result.title.rendered
+
+                if ( result.acf.case_location ) {
+                    resultsHTML += ', ' + result.acf.case_location
+                }
+
+                resultsHTML += '</cite></p>'
+
+            resultsHTML += '</div>'
             resultsHTML += '</article>'
             }
         }

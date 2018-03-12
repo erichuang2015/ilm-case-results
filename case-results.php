@@ -42,8 +42,7 @@
                                 <path fill="#1e2327" d="M10.5 9.8h.1L.7 0 0 .7l9.2 9.1h-.1l.1.1-1.9 1.9L0 19.1l.7.7 8-8 1.9-1.9z"/>
                             </svg>
                             </a>
-                            <div class="pagination-numbers">
-                            </div>
+                            <div class="pagination-numbers"></div>
                         </div>
                     </div>
                 </div>

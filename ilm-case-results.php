@@ -236,6 +236,14 @@ function ilm_register_case_results() {
 
 add_action( 'init', 'ilm_register_case_results' );
 
+function ilm_case_results_remove_autop_for_posttype( $content ) {
+    # edit the post type here
+    'case_results' === get_post_type() && remove_filter( 'the_content', 'wpautop' );
+    return $content;
+}
+
+add_filter( 'the_content', 'ilm_case_results_remove_autop_for_posttype', 0 );
+
 if( function_exists('acf_add_local_field_group') ):
 
 acf_add_local_field_group(array(
