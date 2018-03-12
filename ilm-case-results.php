@@ -236,4 +236,89 @@ function ilm_register_case_results() {
 
 add_action( 'init', 'ilm_register_case_results' );
 
+if( function_exists('acf_add_local_field_group') ):
+
+acf_add_local_field_group(array(
+	'key' => 'group_5aa6db70a202b',
+	'title' => 'Case Results',
+	'fields' => array(
+		array(
+			'key' => 'field_5aa6db79c8488',
+			'label' => 'Case Result Type',
+			'name' => 'case_result_type',
+			'type' => 'text',
+			'instructions' => 'Auto Accident, Worker\'s Comp, Confidential, etc.',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'default_value' => '',
+			'placeholder' => '',
+			'prepend' => '',
+			'append' => '',
+			'maxlength' => '',
+		),
+		array(
+			'key' => 'field_5aa6dc01c8489',
+			'label' => 'Case Result Amount',
+			'name' => 'case_result_amount',
+			'type' => 'text',
+			'instructions' => 'Type as you\'d like to display, ex: $1,000,000 OR $1M',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'default_value' => '',
+			'placeholder' => '',
+			'prepend' => '',
+			'append' => '',
+			'maxlength' => '',
+		),
+		array(
+			'key' => 'field_5aa6dc35c848a',
+			'label' => 'Case Highlight',
+			'name' => 'case_highlight',
+			'type' => 'text',
+			'instructions' => 'Brief summary of case',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'default_value' => '',
+			'placeholder' => '',
+			'prepend' => '',
+			'append' => '',
+			'maxlength' => '',
+		),
+	),
+	'location' => array(
+		array(
+			array(
+				'param' => 'post_type',
+				'operator' => '==',
+				'value' => 'case_results',
+			),
+		),
+	),
+	'menu_order' => 0,
+	'position' => 'normal',
+	'style' => 'default',
+	'label_placement' => 'top',
+	'instruction_placement' => 'label',
+	'hide_on_screen' => '',
+	'active' => 1,
+	'description' => '',
+));
+
+endif;
+
 ?>
