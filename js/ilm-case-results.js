@@ -105,7 +105,7 @@
             resultsHTML += '<div class="right">'
                 resultsHTML += '<h3 class="highlight">' + result.acf.case_highlight + '</h2>'
                 resultsHTML += '<p>' + result.content.rendered + ' '
-                resultsHTML += '<cite>&bull; ' + result.title.rendered
+                resultsHTML += '<cite><span>&bull;</span> ' + result.title.rendered
 
                 if ( result.acf.case_location ) {
                     resultsHTML += ', ' + result.acf.case_location
