@@ -18,73 +18,9 @@
     */
 
     const container = $('.results')
-    const mainCats  = $('.main-cat')
-    const subCats   = $('.sub-cat')
-    const secondary = $('.bottom-wrap .filters')
-    const featured  = $('.featured-category')
-    const prev      = $('.results-prev')
-    const next      = $('.results-next')
-    const pageLinks = $('.pagination-numbers')
-    const selectBox = $('.select-wrap ul')
     const pageCont = $('#page-container')
 
-    let currentCat      = ''
-    let catSlug         = ''
-    let currentList     = ''
-    let children        = ''
-    let offset          = 0
-    let totalPosts      = 0
-    let resultCount     = 5
-    let resultsURL      = ''
-    let allCategories   = true
-    let parentCategory  = true
-    let externalSource  = false
-
     const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/results'
-
-    /*
-    ** Scroll the window to results
-    */
-    const scrollUp = () => {
-        $('html, body').animate({
-            scrollTop: container.offset().top - 300
-        }, 1000)
-    }
-
-    /*
-    ** Get the total amount of posts so we know what we're
-    ** Dealing with when it comes to offsets, etc.
-    */
-    const getTotalCPT = () => {
-        $.getJSON(path + '?per_page=100', postTotalCallback)
-    }
-
-    const postTotalCallback = data => {
-        totalPosts = data.length
-        console.log('Total Posts: ', totalPosts)
-        createPagination()
-    }
-
-    const createPagination = () => {
-
-        let paginationContainer = $('.pagination-numbers')
-        let amountOfLinks       = parseFloat( totalPosts / resultCount )
-        let paginationHtml      = ''
-
-        paginationContainer.empty()
-
-        if ( amountOfLinks < 1 ) {
-            paginationHtml += '<a href="#" data-page="1" class="page-number active">1</a>'
-        }
-
-        else {
-            for ( var i = 1; i <= amountOfLinks; i++ ) {
-                paginationHtml += '<a href="#" data-page="' + i + '" class="page-number">' + i + '</a>'
-            }
-        }
-
-        paginationContainer.html( paginationHtml )
-    }
 
     const updateResultsHTML = data => {
         /*
@@ -121,39 +57,13 @@
         container.html( resultsHTML )
     }
 
-    const resultsUpdateComplete = () => {
-        resultsURL = ''
-        offset = parseInt(pageCont.attr('data-offset'))
-
-        if ( offset !== 0 ) {
-            resultsURL = '?offset=' + offset
-            prev.removeClass('disabled')
-        }
-
-        else {
-            prev.addClass('disabled')
-        }
-
-        history.pushState( { offset: offset }, "", resultsURL )
-    }
-
     const updateResults = () => {
 
-        let offset = pageCont.attr('data-offset')
-
-        if ( pageCont.attr('data-offset') ) {
-            offset = pageCont.attr('data-offset')
-        }
-
         $.ajax({
-            url: path + '?order=asc&per_page=' + resultCount + '&offset=' + offset,
+            url: path + '?order=asc',
 
             success: function( data ) {
                 updateResultsHTML( data )
-            },
-
-            complete: function() {
-                resultsUpdateComplete()
             },
 
             error: function() {
@@ -163,59 +73,8 @@
     }
 
     /*
-    ** Event Handlers
-    */
-
-    /*
-    ** If the offset is greater than or equal
-    ** to totalPosts then stop, else add to it
-    */
-    next.on('click', function() {
-        offset = offset >= totalPosts ? totalPosts : offset + resultCount
-        pageCont.attr('data-offset', offset)
-        scrollUp()
-
-        updateResults()
-    })
-
-    /*
-    ** If the offset is less than or equal to zero
-    ** Then keep it at zero, else subtract from it
-    */
-    prev.on('click', function() {
-        offset = offset <= 0 ? 0 : offset - resultCount
-        pageCont.attr('data-offset', offset)
-        scrollUp()
-
-        updateResults()
-    })
-
-    /*
-    ** Pagination Numbers
-    ** Figure out which offset to apply
-    ** by comparing page to offset values
-    */
-    pageLinks.on('click', 'a', function(e) {
-        e.preventDefault()
-        let self = $(this)
-        let pageNum = self.attr('data-page')
-
-        self.siblings().removeClass('active')
-        self.toggleClass('active')
-
-        offset = parseInt(resultCount * parseInt(pageNum-1))
-        pageCont.attr('data-offset', offset)
-
-        scrollUp()
-        updateResults()
-    })
-
-    /*
     ** Load all results on page load.
     */
-    allCategories = true
-    getTotalCPT()
-    createPagination()
     updateResults()
 
 })(jQuery)
