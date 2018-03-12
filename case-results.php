@@ -18,84 +18,17 @@
         id="page-container"
         class="clearfix full-width"
         <?php
-        if ( $category ) { echo 'data-cat="' . $category . '"'; }
-        if ( $offset ) { echo ' data-offset="' . $offset . '"'; }
+        if ( $category ) { echo 'data-cat="' . $category . '"'; } else { echo 'data-cat="0"'; }
+        if ( $offset ) { echo ' data-offset="' . $offset . '"'; } else { echo 'data-offset="0"'; }
         ?>
     >
 		<div class="main-content">
 			<?php if ( have_posts() ) : while ( have_posts() ) : the_post(); ?>
                 <div class="top-wrap">
                     <h1 class="page-title"><?php the_title();?></h1>
-                    <div class="filters">
-                        <div class="select-wrap">
-                            <p>Step 1: Select Main Practice Area</p>
-                            <ul class="main-cat" data-current="none">
-                                <li class="view-all active">View All</li>
-                                <?php
-                                /*
-                                ** Get pages that have no parent, which
-                                ** means that they are top-level
-                                */
-                                $results = new WP_Query(array(
-                                    'post_type' => 'case_results',
-                                    'post_parent' => 0,
-                                    'posts_per_page' => -1,
-                                    'orderby' => 'title',
-                                    'order' => 'ASC'
-                                ));
-
-                                /*
-                                ** Create a variable to hold child data
-                                */
-                                $childPages = '';
-
-                                if ( $results->have_posts() ) : while ( $results->have_posts() ) : $results->the_post();
-
-                                    /*
-                                    ** If this result has children, loop over them all
-                                    ** adding each to our empty variable of $childPages
-                                    ** to be used elsewhere in the layout
-                                    */
-                                    $children = get_children(array(
-                                        'post_parent' => $post->ID
-                                    ));
-                                    if ( $children ) :
-
-                                        foreach ( $children as $child ) {
-                                            $childPages .= '<li data-name="'.$child->post_name.'"';
-                                            $childPages .= 'data-id="'.$child->ID.'"';
-                                            $childPages .= 'data-parent="'.$post->ID.'">';
-                                            $childPages .= get_the_title($child);
-                                            $childPages .= '</li>';
-                                        }
-                                    /*
-                                    ** After child data collection is done, output the parent
-                                    ** as a list item with some filter identifying attributes
-                                    */
-                                    ?>
-                                    <li data-name="<?php echo $post->post_name; ?>" data-id="<?php echo $post->ID; ?>">
-                                        <?php the_title(); ?>
-                                    </li>
-
-                                    <?php endif; wp_reset_query(); ?>
-                                <?php endwhile; endif; ?>
-                            </ul>
-                        </div>
-                    </div>
                 </div>
                 <div class="bottom-wrap">
                     <div class="container">
-                        <p class="intro">Top Featured Results <span class="featured-category"></span></p>
-                        <div class="filters">
-                            <div class="select-wrap">
-                                <p>Step 2: Select Specific Practice Area</p>
-                                <ul class="sub-cat disabled" data-current="none">
-                                    <li class="view-all active">View All</li>
-                                    <?php echo $childPages; ?>
-                                </ul>
-                            </div>
-                        </div>
-
                         <div class="results"></div>
 
                         <div class="pagination">

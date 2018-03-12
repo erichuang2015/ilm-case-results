@@ -17,16 +17,16 @@
     ** have been used, avoiding hard reloads.
     */
 
-    const container = $('.results')
-    const mainCats  = $('.main-cat')
-    const subCats   = $('.sub-cat')
-    const secondary = $('.bottom-wrap .filters')
-    const featured  = $('.featured-category')
-    const prev      = $('.results-prev')
-    const next      = $('.results-next')
-    const pageLinks = $('.pagination-numbers')
-    const selectBox = $('.select-wrap ul')
-    const pageCont  = $('#page-container')
+   const container = $('.results')
+   const mainCats  = $('.main-cat')
+   const subCats   = $('.sub-cat')
+   const secondary = $('.bottom-wrap .filters')
+   const featured  = $('.featured-category')
+   const prev      = $('.results-prev')
+   const next      = $('.results-next')
+   const pageLinks = $('.pagination-numbers')
+   const selectBox = $('.select-wrap ul')
+    const pageCont = $('#page-container')
 
     let currentCat      = ''
     let catSlug         = ''
@@ -35,7 +35,6 @@
     let offset          = 0
     let totalPosts      = 0
     let resultCount     = 5
-    let catNameDisplay  = ''
     let resultsURL      = ''
     let allCategories   = true
     let parentCategory  = true
@@ -43,36 +42,13 @@
 
     const path = window.location.protocol + '//' + window.location.hostname + '/wp-json/wp/v2/results'
 
-    const externalRefferal = () => {
-
-        /*
-        ** Get the category name of the query string and match
-        ** it to an ID of a list item in the select-wrap,
-        ** then apply the ID to the original container
-        */
-        let catName = $('#page-container').attr('data-cat')
-
-        catSlug = catName
-        currentCat = $('li[data-name="' + catName + '"]').attr('data-id')
-        pageCont.attr('data-id', currentCat)
-
-        let selectedItem = $('li[data-name="'+catName+'"]')
-            selectedItem.addClass('active')
-            selectedItem.siblings('.active').removeClass('active')
-
-        let selectedParentID = selectedItem.attr('data-parent')
-        let selectedParent = $('.main-cat li[data-id="'+selectedParentID+'"]')
-            selectedParent.addClass('active')
-            selectedParent.siblings('.active').removeClass('active')
-
-        featured.text( selectedItem.text() )
-        $('.disabled').removeClass('disabled')
-
-        if ( $('#page-container[data-offset]').length ) {
-            offset = parseInt($('#page-container').attr('data-offset'))
-        } else {
-            offset = 0
-        }
+    /*
+    ** Scroll the window to results
+    */
+    const scrollUp = () => {
+        $('html, body').animate({
+            scrollTop: container.offset().top - 300
+        }, 1000)
     }
 
     /*
@@ -83,111 +59,10 @@
         $.getJSON(path + '?per_page=100', postTotalCallback)
     }
 
-    const getTotalPosts = ( cat ) => {
-        $.getJSON(path + '?per_page=100&parent=' +cat, postTotalCallback)
-    }
-
     const postTotalCallback = data => {
         totalPosts = data.length
+        console.log('Total Posts: ', totalPosts)
         createPagination()
-    }
-
-    const updateCurrentCategory = el => {
-
-        if ( parentCategory ) {
-
-            currentCat = el.attr('data-id')
-            children = ''
-            children += currentCat
-
-            $('li[data-parent^='+currentCat+']').each(function() {
-                let self = $(this)
-                children += ','
-                children += self.attr('data-id')
-            })
-
-            currentList = children
-            pageCont.attr('data-id', currentList)
-        }
-        else {
-            currentCat = el.attr('data-id')
-            pageCont.attr('data-id', currentCat)
-        }
-    }
-
-    const updateCatSlug = el => {
-        catSlug = el.attr('data-name')
-        pageCont.attr('data-name', catSlug)
-    }
-
-    const updateCatNameDisplay = el => {
-        catNameDisplay = el.text()
-        featured.text( catNameDisplay )
-    }
-
-    const activeCategory = el => {
-        el.addClass('active')
-        el.siblings().removeClass('active')
-    }
-
-    const processCategory = el => {
-
-        activeCategory( el )
-        updateCatSlug( el )
-        updateCatNameDisplay( el )
-        updateCurrentCategory( el )
-
-        getTotalPosts( currentCat )
-        createPagination()
-        updateResults( currentCat )
-
-    }
-
-    const resetSubCategories = () => {
-        subCats.children().attr('class', '')
-        subCats.children('[data-parent!="' + currentCat + '"]').addClass('hidden')
-        subCats.children('li:first-child').removeClass('hidden')
-    }
-
-    const mainCatSelected = el => {
-
-        allCategories = false
-        parentCategory = true
-        pageCont.attr('data-offset', '0')
-        processCategory( el )
-
-        subCats.removeClass('disabled')
-        resetSubCategories()
-    }
-
-    const subCatSelected = el => {
-        parentCategory = false
-        pageCont.attr('data-offset', '0')
-        processCategory( el )
-    }
-
-    const resetFilters = () => {
-        mainCats.children().removeClass('active')
-        subCats.addClass('disabled')
-        subCats.children().removeClass('active')
-        featured.empty()
-        allCategories = true
-
-        if ( secondary.is(':visible') ) {
-            secondary.slideToggle()
-        }
-
-        getTotalCPT()
-        updateResults()
-    }
-
-    /*
-    ** Scroll the window to results
-    */
-    const scrollUp = () => {
-        $('html, body').animate({
-            scrollTop: container.offset().top - 300
-        }, 1000)
     }
 
     const createPagination = () => {
@@ -235,126 +110,45 @@
         offset = parseInt(pageCont.attr('data-offset'))
 
         if ( offset !== 0 ) {
-            resultsURL = '?cat=' + catSlug + '&offset=' + offset
+            resultsURL = '?offset=' + offset
             prev.removeClass('disabled')
         }
 
         else {
-            resultsURL = '?cat=' + catSlug
             prev.addClass('disabled')
         }
 
-        history.pushState(
-            {
-            catSlug: catSlug,
-            catID: currentCat,
-            offset: offset
-            },
-            "",
-            resultsURL
-        )
+        history.pushState( { offset: offset }, "", resultsURL )
     }
 
     const updateResults = () => {
 
-        let category    = pageCont.attr('data-id')
-        let offset      = pageCont.attr('data-offset')
+        let offset = pageCont.attr('data-offset')
 
         if ( pageCont.attr('data-offset') ) {
             offset = pageCont.attr('data-offset')
         }
 
-        if ( category === undefined || category === 'undefined' || allCategories ) {
+        $.ajax({
+            url: path + '?order=asc&per_page=' + resultCount + '&offset=' + offset,
 
-            $.ajax({
-                url: path + '?per_page=' + resultCount,
+            success: function( data ) {
+                updateResultsHTML( data )
+            },
 
-                beforeSend: function() {
-                    featured.empty()
-                    if ( secondary.is(':visible') ) {
-                        secondary.slideToggle()
-                    }
-                },
+            complete: function() {
+                resultsUpdateComplete()
+            },
 
-                success: function( data ) {
-                    updateResultsHTML( data )
-                },
-
-                error: function( settings ) {
-                    console.log('AJAX request URL invalid or not found: ', settings.url)
-                }
-            })
-        }
-
-        else {
-            $.ajax({
-                url: path + '?order=asc&per_page=' + resultCount + '&parent=' + category + '&offset=' + offset,
-
-                success: function( data ) {
-                    updateResultsHTML( data )
-                },
-
-                complete: function() {
-                    resultsUpdateComplete()
-                },
-
-                error: function() {
-                    console.log('AJAX request URL invalid or not found')
-                }
-            })
-        }
+            error: function() {
+                console.log('AJAX request URL invalid or not found')
+            }
+        })
     }
 
     /*
     ** Event Handlers
     */
-
-    selectBox.on('click', 'li', function() {
-
-        let self = $(this)
-
-        if ( externalSource ) {
-            externalSource = false
-        }
-
-        self.parent().toggleClass('open')
-
-        /*
-        ** Only fire if element has not first,
-        ** indicating that it is a category and
-        ** not the default "View All" list item
-        */
-        if ( self.not(':first-child') ) {
-
-            /*
-            ** Only fire an update if this is
-            ** not the currently active category
-            */
-            if ( !self.hasClass('active') ) {
-
-                if ( self.parent().hasClass('main-cat') ) {
-
-                    mainCatSelected( self )
-
-                    if ( !secondary.is(':visible') ) {
-                        secondary.slideToggle()
-                    }
-
-                } else {
-                    subCatSelected( self )
-                }
-            }
-
-        } else {
-
-            /*
-            ** "View All" is the target, then reset
-            */
-            if ( self.parent().hasClass('main-cat') ) {
-                resetFilters()
-            }
-        }
-    })
 
     /*
     ** If the offset is greater than or equal
@@ -401,30 +195,11 @@
     })
 
     /*
-    ** This runs on page load. If user got here
-    ** with a direct URL, PHP should load attr's
-    ** we check to know that and run the update.
-    ** Otherwise, load all results.
+    ** Load all results on page load.
     */
-    if ( $('#page-container[data-cat]').length ) {
-        externalSource = true
-        externalRefferal()
-    }
-
-    if ( !externalSource ) {
-
-        resetFilters()
-
-    } else {
-
-        allCategories = false
-        parentCategory = false
-        updateResults()
-
-        if ( !secondary.is(':visible') ) {
-            secondary.slideToggle()
-        }
-
-    }
+    allCategories = true
+    getTotalCPT()
+    createPagination()
+    updateResults()
 
 })(jQuery)
