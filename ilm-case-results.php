@@ -299,6 +299,25 @@ acf_add_local_field_group(array(
 			'append' => '',
 			'maxlength' => '',
 		),
+		array(
+			'key' => 'field_5aa6dfbfa7e2a',
+			'label' => 'Case Location',
+			'name' => 'case_location',
+			'type' => 'text',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'default_value' => '',
+			'placeholder' => '',
+			'prepend' => '',
+			'append' => '',
+			'maxlength' => '',
+		),
 	),
 	'location' => array(
 		array(
